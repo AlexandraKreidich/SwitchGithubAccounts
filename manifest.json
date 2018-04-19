@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+
+  "name": "Account Switcher",
+  "version": "1.0",
+
+  "permissions": ["https://github.com/*"],
+
+  "browser_action": {
+    "default_title": "Open",
+    "default_icon": "icons/default.jpg",
+    "default_popup": "popup.html"
+  }
+}
