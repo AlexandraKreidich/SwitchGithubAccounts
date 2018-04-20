@@ -4,7 +4,19 @@
   "name": "Account Switcher",
   "version": "1.0",
 
-  "permissions": ["https://github.com/*"],
+  "permissions": [
+    "http://translate.yandex.net/*",
+    "cookies",
+    "tabs",
+    "http://*/*",
+    "https://*/*",
+    "storage",
+    "https://github.com/"
+  ],
+
+  "background": {
+    "scripts": ["popup.js"]
+  },
 
   "browser_action": {
     "default_title": "Open",
