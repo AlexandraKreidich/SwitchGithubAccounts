@@ -3,15 +3,32 @@
 
 <head>
     <link rel="stylesheet" href="bootstrap.css" />
-    <script src="popup.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script src="popup_new.js"></script>
 </head>
 
 <body>
-    <button id="show" type="button" class="btn btn-primary">Show</button>
-    <button id="delete" type="button" class="btn btn-primary">Delete</button>
-    <button id="save" type="button" class="btn btn-primary">save</button>
-    <button id="copyFromLS" type="button" class="btn btn-primary">copy</button>
-    <div id="result"></div>
+    <div class="container">
+        <div class="row" id="accounts">
+        </div>
+        <div class="row">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <button class="btn btn-success" type=" button " id="add-new-account-btn">Add new</button>
+                </div>
+                <input id="new-account-input" type="text" class="form-control" placeholder="unique name">
+            </div>
+        </div>
+        <div class="row">
+            <button class="btn btn-danger" type=" button " id="reset-accounts-btn">Reset accounts</button>
+            <button class="btn btn-danger" type=" button " id="reset-store-btn">Reset cookie store</button>
+        </div>
+    </div>
+    <!-- <button id="show" type="button " class="btn btn-primary ">Show</button>
+    <button id="delete" type="button " class="btn btn-primary ">Delete</button>
+    <button id="save" type="button " class="btn btn-primary ">save</button>
+    <button id="copyFromLS" type="button " class="btn btn-primary ">copy</button>
+    <div id="result "></div> -->
 </body>
 
 </html>

@@ -67,8 +67,8 @@ var App = {
     t.COOKIES.getAll({ domain: t.DOMAIN }, cookiesArr => {
       cookiesJSON = JSON.stringify(cookiesArr);
       localStorage.setItem(t.DOMAIN, cookiesJSON);
-      // let Arr = JSON.parse(localStorage.getItem(t.DOMAIN));
-      // t.resultDiv.innerHTML = JSON.stringify(Arr);
+      let Arr = JSON.parse(localStorage.getItem(t.DOMAIN));
+      t.resultDiv.innerHTML = JSON.stringify(Arr);
     });
   },
 
@@ -88,16 +88,30 @@ var App = {
     var t = this;
 
     let cookiesArr = JSON.parse(localStorage.getItem(t.DOMAIN));
+    let urlStr = "https://" + t.DOMAIN;
 
-    for (var i in cookiesArr) {
-      t.COOKIES.set(cookiesArr[i], function(cookie) {
-        alert(JSON.stringify(cookie));
-        alert(chrome.extension.lastError);
-        alert(chrome.runtime.lastError);
+    let cookiesToSet = [];
+
+    cookiesToSet = cookiesArr.filter(function(cookie) {
+      if (cookie.hostOnly !== undefined) {
+        delete cookie.hostOnly;
+      }
+      if (cookie.session !== undefined) {
+        delete cookie.session;
+      }
+      console.log(cookie);
+      return true;
+    });
+
+    for (var i in cookiesToSet) {
+      cookiesToSet[i].url = urlStr;
+      console.log(cookiesToSet[i]);
+      t.COOKIES.set(cookiesToSet[i], cookie => {
+        console.log(cookie);
       });
     }
 
-    t.resultDiv.innerHTML = JSON.stringify(cookiesArr);
+    t.resultDiv.innerHTML = JSON.stringify(cookiesToSet);
   }
 };
 
