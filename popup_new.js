@@ -1,18 +1,24 @@
-var App = {
-  domainName: "github.com",
-  appSettings: [],
-  appSettingsDiv: null,
-  addNewAccountBtn: null,
-  addNewAccountInput: null,
-  resetAccountsBtn: null,
-  resetCookiesBtn: null,
+class App {
+  constructor() {
+    this.domainName = "github.com";
 
-  init: function() {
+    let settings = JSON.parse(localStorage.getItem(this.domainName));
+    if (settings !== null) {
+      this.appSettings = settings;
+    } else {
+      this.appSettings = [];
+    }
+
     this.appSettingsDiv = document.getElementById("accounts");
     this.addNewAccountBtn = document.getElementById("add-new-account-btn");
     this.addNewAccountInput = document.getElementById("new-account-input");
     this.resetAccountsBtn = document.getElementById("reset-accounts-btn");
     this.resetCookiesBtn = document.getElementById("reset-store-btn");
+
+    this.addEventListeners();
+  }
+
+  addEventListeners() {
     this.resetCookiesBtn.addEventListener("click", () => {
       this.deleteCookiesFromCookieStore();
     });
@@ -25,20 +31,20 @@ var App = {
     this.addNewAccountBtn.addEventListener("click", () => {
       this.addNewAccount();
     });
-    let settings = JSON.parse(localStorage.getItem(this.domainName));
-    if (settings !== null) {
-      this.appSettings = settings;
-    }
-    this.showAppSettingsHtml();
-  },
 
-  saveNewAppSettings: function() {
+    this.showAppSettingsHtml();
+  }
+
+  saveNewAppSettings() {
     localStorage.removeItem(this.domainName);
     localStorage.setItem(this.domainName, JSON.stringify(this.appSettings));
+    console.log("savenewappsettings: ", this.appSettings);
     this.showAppSettingsHtml();
-  },
+  }
 
-  showAppSettingsHtml: function() {
+  showAppSettingsHtml() {
+    console.log("showappsettings: ", this.appSettings);
+
     let t = this;
 
     if (t.appSettings.length === 0) {
@@ -66,16 +72,17 @@ var App = {
       str += "</ul>";
       t.appSettingsDiv.innerHTML = str;
     }
-  },
+  }
 
-  saveCookiesToLocalStorage(name) {
-    chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
-      cookiesJSON = JSON.stringify(cookiesArr);
+  async saveCookiesToLocalStorage(name) {
+    await chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
+      let cookiesJSON = JSON.stringify(cookiesArr);
       localStorage.setItem(name, cookiesJSON);
+      console.log("saveCookies: ", cookiesJSON);
     });
-  },
+  }
 
-  setCookiesFromLocalStorage(name) {
+  async setCookiesFromLocalStorage(name) {
     let cookiesArr = JSON.parse(localStorage.getItem(name));
     let urlStr = "https://" + this.domainName;
 
@@ -94,15 +101,14 @@ var App = {
 
     for (var i in cookiesToSet) {
       cookiesToSet[i].url = urlStr;
-
-      chrome.cookies.set(cookiesToSet[i], cookie => {
+      await chrome.cookies.set(cookiesToSet[i], cookie => {
         console.log(cookie);
       });
     }
-  },
+  }
 
-  deleteCookiesFromCookieStore: function() {
-    chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
+  async deleteCookiesFromCookieStore() {
+    await chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
       for (var i in cookiesArr) {
         chrome.cookies.remove({
           url: "https://" + cookiesArr[i].domain + cookiesArr[i].path,
@@ -110,9 +116,10 @@ var App = {
         });
       }
     });
-  },
+  }
 
-  addNewAccount: function() {
+  addNewAccount() {
+    console.log("addnew");
     let accountName = this.addNewAccountInput.value;
     if (name !== null) {
       let newAccount = {
@@ -124,14 +131,14 @@ var App = {
       this.appSettings.push(newAccount);
       this.saveNewAppSettings();
     }
-  },
+  }
 
-  resetAccounts: function() {
+  resetAccounts() {
     this.appSettings = [];
     this.saveNewAppSettings();
-  },
+  }
 
-  swithAccount: function(e) {
+  swithAccount(e) {
     let accountName = this.appSettings[e.target.id].name;
     this.appSettings.forEach(element => {
       if (element.isActive) {
@@ -142,9 +149,9 @@ var App = {
     this.deleteCookiesFromCookieStore();
     this.setCookiesFromLocalStorage(accountName);
     this.reloadPage();
-  },
+  }
 
-  reloadPage: function() {
+  reloadPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, function(
       arrayOfTabs
     ) {
@@ -152,9 +159,8 @@ var App = {
       chrome.tabs.executeScript(arrayOfTabs[0].id, { code: code });
     });
   }
-};
+}
 
 window.onload = function() {
-  App.init();
-  App.deleteCookiesFromCookieStore();
+  let accountSwitcher = new App();
 };
