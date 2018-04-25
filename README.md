@@ -1,2 +1,0 @@
-# SwitchGithubAccounts
-Chrome extension
