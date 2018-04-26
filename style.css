@@ -1,0 +1,21 @@
+.input-group {
+  width: 400px;
+}
+
+.list-group {
+  width: 400px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.card {
+  width: 400px;
+}
+
+.btn-danger {
+  margin-right: 10px;
+}
+
+.checkout-acc-btn {
+  margin-left: 80px;
+}
