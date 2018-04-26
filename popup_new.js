@@ -43,10 +43,7 @@ class App {
   }
 
   showAppSettingsHtml() {
-    console.log("showappsettings: ", this.appSettings);
-
     let t = this;
-
     if (t.appSettings.length === 0) {
       t.appSettingsDiv.innerHTML =
         '<div class="card"><div class="card-body">No saved accounts</div></div>';
@@ -59,14 +56,14 @@ class App {
             i +
             ">" +
             t.appSettings[i].name +
-            "</li>";
+            '<button type="button" class="btn btn-light btn-sm checkout-acc-btn" disabled>Checkout</button></li>';
         } else {
           str +=
             '<li class="list-group-item" id=' +
             i +
             ">" +
             t.appSettings[i].name +
-            "</li>";
+            '<button type="button" class="btn btn-success btn-sm checkout-acc-btn">Checkout</button></li>';
         }
       }
       str += "</ul>";
@@ -78,7 +75,7 @@ class App {
     await chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
       let cookiesJSON = JSON.stringify(cookiesArr);
       localStorage.setItem(name, cookiesJSON);
-      console.log("saveCookies: ", cookiesJSON);
+      //console.log("saveCookies: ", cookiesJSON);
     });
   }
 
@@ -102,9 +99,15 @@ class App {
     for (var i in cookiesToSet) {
       cookiesToSet[i].url = urlStr;
       await chrome.cookies.set(cookiesToSet[i], cookie => {
-        console.log(cookie);
+        //console.log(cookie);
       });
     }
+
+    //to make sure that cookies are in cookie store
+    // await chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
+    //   let cookiesJSON = JSON.stringify(cookiesArr);
+    //   console.log("savedCookies: ", cookiesJSON);
+    // });
   }
 
   async deleteCookiesFromCookieStore() {
@@ -116,21 +119,55 @@ class App {
         });
       }
     });
+
+    // to make shure that cookies sre deleted
+    // await chrome.cookies.getAll({ domain: this.domainName }, cookiesArr => {
+    //   let cookiesJSON = JSON.stringify(cookiesArr);
+    //   console.log("Cookies after deleting from cookie store: ", cookiesJSON);
+    // });
+  }
+
+  getCookiesFromCookieStore() {
+    let t = this;
+    return new Promise(function(resolve) {
+      chrome.cookies.getAll({ domain: t.domainName }, cookiesArr => {
+        resolve(cookiesArr);
+      });
+    });
+  }
+
+  getJSONCookies() {
+    return this.getCookiesFromCookieStore().then(JSON.stringify);
+  }
+
+  createNewAccountObject(cookiesJSON, accountName) {
+    return {
+      name: accountName,
+      cookies: resp,
+      isActive: false
+    };
   }
 
   addNewAccount() {
-    console.log("addnew");
-    let accountName = this.addNewAccountInput.value;
-    if (name !== null) {
-      let newAccount = {
-        name: accountName,
-        isActive: this.appSettings.length === 0 ? true : false
-      };
+    let t = this;
 
-      this.saveCookiesToLocalStorage(newAccount.name);
-      this.appSettings.push(newAccount);
-      this.saveNewAppSettings();
-    }
+    console.log("addnew");
+
+    let accountName = t.addNewAccountInput.value;
+    t.addNewAccountInput.value = "";
+
+    t.getJSONCookies().then(function(resp) {
+      if (name !== null) {
+        this.getJSONCookies()
+          .then(this.createNewAccountObject)
+          .then(newAccount => {
+            t.appSettings.push(account);
+            t.saveNewAppSettings();
+
+            console.log(newAccount);
+          });
+      }
+    });
   }
 
   resetAccounts() {
