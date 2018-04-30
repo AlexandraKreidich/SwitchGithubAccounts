@@ -10,6 +10,27 @@ class App {
     this.addEventListeners();
   }
 
+  refreshUserSession(newValue) {
+
+    let t = this;
+
+    t
+      .appData
+      .forEach(account => {
+        if (account.isActive) {
+          account
+            .cookies
+            .forEach(cookie => {
+              if (cookie.name === "user_session") {
+                cookie.expirationDate = newValue;
+                t.saveNewAppData();
+              }
+            })
+        }
+      })
+
+  }
+
   getDataFromLocalStorage() {
     let data = JSON.parse(localStorage.getItem(this.domainName));
 
@@ -21,22 +42,32 @@ class App {
   }
 
   addEventListeners() {
-    this
+    let t = this;
+
+    t
       .addNewAccountBtn
       .addEventListener("click", () => {
-        this.addNewAccount();
+        t.addNewAccount();
       });
-    this
+    t
       .appDataDiv
       .addEventListener("click", e => {
-        this.onAccountBtnClick(e);
+        t.onAccountBtnClick(e);
       });
-    this
+    t
       .errorMsgDiv
       .addEventListener("click", e => {
-        this.onErrorMsgDiv(e);
-      })
-    this.showAppData();
+        t.onErrorMsgDiv(e);
+      });
+    chrome
+      .cookies
+      .onChanged
+      .addListener((changeInfo) => {
+        if (changeInfo.cookie.name === "user_session" && changeInfo.cause === "explicit") {
+          t.refreshUserSession(parseFloat(changeInfo.cookie.expirationDate));
+        }
+      });
+    t.showAppData();
   }
 
   getCookiesFromCookieStore() {
