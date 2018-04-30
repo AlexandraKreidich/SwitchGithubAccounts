@@ -5,17 +5,61 @@
 .list-group {
   width: 400px;
   margin-bottom: 20px;
-  margin-top: 20px;
 }
 
 .card {
   width: 400px;
 }
 
+.empty-accounts {
+  margin-bottom: 10px;
+}
+
 .btn-danger {
   margin-right: 10px;
 }
 
-.checkout-acc-btn {
-  margin-left: 80px;
+.header {
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+.app-container {
+  margin: 10px;
+}
+
+body {
+  background-color: #f4f4f4;
+}
+
+.close {
+  color: #960019;
+}
+
+.btn-light {
+  color: #11280c;
+  background-color: #c2d9ad;
+}
+
+.btn-light:hover {
+  background-color: #c2d9ad;
+  border-color: #11280c;
+}
+
+.user-btn-success {
+  background-color: #bb3c51;
+  border-color: #af102a;
+}
+
+.user-btn-success:hover {
+  background-color: #bb3c51;
+  border-color: #fde038;
+}
+
+.active-item {
+  background-color: #fcf8e3;
+}
+
+.error-alert {
+  width: 400px;
 }

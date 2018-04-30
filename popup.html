@@ -8,27 +8,22 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container app-container">
+        <div class="container header text-center">
+            <h4>Github accounts switcher</h4>
+        </div>
         <div class="row" id="accounts">
         </div>
         <div class="row">
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <button class="btn btn-success" type=" button " id="add-new-account-btn">Add new</button>
+                    <button class="btn user-btn-success font-weight-bold" type=" button " id="add-new-account-btn">Add new</button>
                 </div>
                 <input id="new-account-input" type="text" class="form-control" placeholder="unique name">
             </div>
         </div>
-        <div class="row">
-            <button class="btn btn-danger" type=" button " id="reset-accounts-btn">Reset accounts</button>
-            <button class="btn btn-danger" type=" button " id="reset-store-btn">Reset cookie store</button>
-        </div>
+        <div class="row" id="error-msg"></div>
     </div>
-    <!-- <button id="show" type="button " class="btn btn-primary ">Show</button>
-    <button id="delete" type="button " class="btn btn-primary ">Delete</button>
-    <button id="save" type="button " class="btn btn-primary ">save</button>
-    <button id="copyFromLS" type="button " class="btn btn-primary ">copy</button>
-    <div id="result "></div> -->
 </body>
 
 </html>

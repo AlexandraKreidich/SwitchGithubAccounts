@@ -1,22 +1,17 @@
 class App {
   constructor() {
     this.domainName = "github.com";
+    this.url = "https://github.com/";
     this.appData = this.getDataFromLocalStorage();
     this.appDataDiv = document.getElementById("accounts");
     this.addNewAccountBtn = document.getElementById("add-new-account-btn");
     this.addNewAccountInput = document.getElementById("new-account-input");
-    this.resetAccountsBtn = document.getElementById("reset-accounts-btn");
-    this.resetCookiesBtn = document.getElementById("reset-store-btn");
-    chrome.cookies.onChanged.addListener(changeInfo => {
-      //console.log(changeInfo);
-    });
+    this.errorMsgDiv = document.getElementById("error-msg");
     this.addEventListeners();
   }
 
   getDataFromLocalStorage() {
     let data = JSON.parse(localStorage.getItem(this.domainName));
-
-    console.log(data);
 
     if (data === null) {
       data = [];
@@ -26,110 +21,209 @@ class App {
   }
 
   addEventListeners() {
-    this.resetCookiesBtn.addEventListener("click", () => {
-      this.deleteCookiesFromCookieStore();
-    });
-    this.resetAccountsBtn.addEventListener("click", () => {
-      this.resetAccounts();
-    });
-    this.addNewAccountBtn.addEventListener("click", () => {
-      this.addNewAccount();
-    });
-    this.appDataDiv.addEventListener("click", e => {
-      this.swithAccount(e);
-    });
+    this
+      .addNewAccountBtn
+      .addEventListener("click", () => {
+        this.addNewAccount();
+      });
+    this
+      .appDataDiv
+      .addEventListener("click", e => {
+        this.onAccountBtnClick(e);
+      });
+    this
+      .errorMsgDiv
+      .addEventListener("click", e => {
+        this.onErrorMsgDiv(e);
+      })
     this.showAppData();
   }
 
   getCookiesFromCookieStore() {
-    console.log("getCookiesFromCookieStore");
-
     let t = this;
-    return new Promise(function(resolve) {
-      chrome.cookies.getAll({ domain: t.domainName }, cookiesArr => {
-        resolve(cookiesArr);
-      });
+
+    return new Promise(function (resolve) {
+      chrome
+        .cookies
+        .getAll({
+          domain: t.domainName
+        }, cookiesArr => {
+          resolve(cookiesArr);
+        });
     });
   }
 
+  onErrorMsgDiv(e) {
+    if (e.target.id === "closeErrorAlert") {
+      this.errorMsgDiv.innerHTML = "";
+    }
+  }
+
+  getErrorMessageHTML(text) {
+    return '<div class="alert alert-danger error-alert"><button type="button" class="close" ' +
+      'id="closeErrorAlert">&times;</button><strong>Ooops!</strong> ' + text + '</div>';
+  }
+
   removeCookie(cookie) {
-    console.log("removeCookie");
-    return new Promise(function(resolve) {
-      chrome.cookies.remove(
-        {
-          url: "https://" + cookie.domain + cookie.path,
+    return new Promise(function (resolve) {
+      chrome
+        .cookies
+        .remove({
+          url: "https://github.com",
           name: cookie.name
-        },
-        cookie => {
-          //console.log(cookie);
+        }, cookie => {
           resolve(cookie);
-        }
-      );
+        });
     });
   }
 
   deleteCookiesFromCookieStore(cookiesArr) {
     let t = this;
 
-    return new Promise(function(resolve) {
-      t.getCookiesFromCookieStore().then(cookiesArr => {
-        Promise.all(cookiesArr.map(t.removeCookie)).then(results => {
-          resolve(results);
+    return new Promise(function (resolve) {
+      t
+        .getCookiesFromCookieStore()
+        .then(cookiesArr => {
+          Promise
+            .all(cookiesArr.map(t.removeCookie))
+            .then(results => {
+              resolve(results);
+            });
         });
-      });
     });
   }
 
   setCookie(cookie) {
-    console.log("setCookie");
-    return new Promise(function(resolve) {
-      chrome.cookies.set(cookie, setedCookie => {
-        //console.log("setedCookie: ", setedCookie);
-        resolve(setedCookie);
-      });
+    return new Promise(function (resolve) {
+      chrome
+        .cookies
+        .set(cookie, setedCookie => {
+          resolve(setedCookie);
+        });
     });
   }
 
   setCookiesToCookieStore(cookiesArr) {
     let t = this;
 
-    return new Promise(function(resolve) {
-      Promise.all(cookiesArr.map(t.setCookie)).then(results => {
-        resolve(results);
-      });
+    return new Promise(function (resolve) {
+      Promise
+        .all(cookiesArr.map(t.setCookie))
+        .then(results => {
+          resolve(results);
+        });
     });
   }
 
   getJSONCookies() {
-    return this.getCookiesFromCookieStore().then(JSON.stringify);
+    return this
+      .getCookiesFromCookieStore()
+      .then(JSON.stringify);
+  }
+
+  checkIfTheNameUnique(accountName) {
+    let flag = true;
+    this
+      .appData
+      .forEach(element => {
+        if (element.name === accountName) {
+          flag = false;
+          t.errorMsgDiv.innerHTML = t.getErrorMessageHTML('The name is not unique.');
+        }
+      });
+    return flag;
+  }
+
+  checkIfCookiesUnique(cookiesArr) {
+
+    let t = this;
+    let userName = '';
+    let result = true;
+
+    cookiesArr.forEach(cookie => {
+      if (cookie.name === 'dotcom_user') {
+        userName = cookie.value;
+      }
+    });
+    t
+      .appData
+      .forEach(account => {
+        account
+          .cookies
+          .forEach(cookie => {
+            if (cookie.name === 'dotcom_user') {
+              if (cookie.value === userName) {
+                result = false;
+                t.errorMsgDiv.innerHTML = t.getErrorMessageHTML('This account already exests.');
+              }
+            }
+          })
+      })
+    return result;
+  }
+
+  selectCookiesToSave(cookiesArr) {
+
+    let t = this;
+    let urlStr = t.url;
+    let cookiesToSet = [];
+
+    cookiesToSet = cookiesArr.filter(function (cookie) {
+      cookie.url = urlStr;
+
+      if (cookie.hostOnly !== undefined) {
+        delete cookie.hostOnly;
+      }
+      if (cookie.session !== undefined) {
+        delete cookie.session;
+      }
+      if (cookie.user_session !== undefined) {
+        delete cookie.user_session;
+      }
+      if (cookie.domain !== undefined && (cookie.name === "user_session" || cookie.name === "__Host-user_session_same_site" || cookie.name === "_gh_sess" || cookie.name === "tz")) {
+        delete cookie.domain;
+      }
+
+      return true;
+    });
+
+    return cookiesToSet;
+
   }
 
   addNewAccount() {
     let t = this;
+    t.errorMsgDiv.innerHTML = "";
 
     let accountName = t.addNewAccountInput.value;
     t.addNewAccountInput.value = "";
 
-    if (accountName !== null) {
-      t.getJSONCookies().then(cookiesResponse => {
-        let newAccount = {
-          name: accountName,
-          cookies: cookiesResponse,
-          isActive: false
-        };
-        t.saveNewAppData(newAccount);
-      });
+    if (accountName !== "" && t.checkIfTheNameUnique(accountName)) {
+
+      t
+        .getCookiesFromCookieStore()
+        .then(cookiesResponse => {
+          if (t.checkIfCookiesUnique(cookiesResponse)) {
+            let newAccount = {
+              name: accountName,
+              cookies: t.selectCookiesToSave(cookiesResponse),
+              isActive: true
+            };
+            t.saveNewAppData(newAccount);
+          }
+        });
     }
   }
 
   saveNewAppData(newAccount) {
+
     if (newAccount !== undefined) {
-      this.appData.push(newAccount);
+      this
+        .appData
+        .push(newAccount);
     }
 
     localStorage.setItem(this.domainName, JSON.stringify(this.appData));
-
-    console.log("savenewappsettings: ", this.appData);
 
     this.showAppData();
   }
@@ -138,33 +232,19 @@ class App {
     let t = this;
 
     if (t.appData.length === 0) {
-      t.appDataDiv.innerHTML =
-        '<div class="card"><div class="card-body">No saved accounts</div></div>';
+      t.appDataDiv.innerHTML = '<div class="card empty-accounts"><div class="card-body">No saved accounts</div><' +
+          '/div>';
     } else {
       let str = '<ul class="list-group"">';
       for (var i in t.appData) {
         if (t.appData[i].isActive) {
-          str +=
-            '<li class="list-group-item active">' +
-            t.appData[i].name +
-            '<button type="button" class="btn btn-light btn-sm checkout-acc-btn" name="switch-account-btn" disabled value=' +
-            i +
-            '>Switch</button><button type="button" class="btn btn-light btn-sm" name="sign-in-btn" value=' +
-            i +
-            ">Sign In</button>" +
-            '<button type="button" class="btn btn-light btn-sm" name="sign-out-btn">Sign Out</button></li>';
+          str += '<li class="list-group-item active-item"><div class="row"><div class="col"><h6>' + t.appData[i].name + '</h6></div><div class="col"><button type="button" class="btn btn-light btn-sm ch' +
+              'eckout-acc-btn" name="sign-out-account-btn" value=' + i + '>Sign out</button><button type="button" class="btn close" name="delete-account-b' +
+              'tn" value=' + i + ">&times;</button></div></div></li>";
         } else {
-          str +=
-            '<li class="list-group-item" id=' +
-            i +
-            ">" +
-            t.appData[i].name +
-            '<button type="button" class="btn btn-success btn-sm checkout-acc-btn" name="switch-account-btn" value=' +
-            i +
-            '>Switch</button><button type="button" class="btn btn-light btn-sm" name="sign-in-btn"value=' +
-            i +
-            ">Sign In</button>" +
-            '<button type="button" class="btn btn-light btn-sm" name="sign-out-btn">Sign Out</button></li>';
+          str += '<li class="list-group-item"><div class="row"><div class="col"><h6>' + t.appData[i].name + '</h6></div><div class="col"><button type="button" class="btn btn-light btn-sm ch' +
+              'eckout-acc-btn" name="sign-in-account-btn" value=' + i + '>Sign In</button><button type="button" class="btn close" name="delete-account-bt' +
+              'n" value=' + i + ">&times;</button></div></div></li>";
         }
       }
       str += "</ul>";
@@ -173,85 +253,89 @@ class App {
     }
   }
 
-  resetAccounts() {
-    this.appData = [];
-    this.saveNewAppData();
-  }
-
-  swithAccount(e) {
+  onAccountBtnClick(e) {
     let t = this;
-    if (e.target.name === "switch-account-btn") {
-      let cookiesArr = JSON.parse(t.appData[e.target.value].cookies);
-      let urlStr = "https://" + this.domainName;
-      let cookiesToSet = [];
-
-      cookiesToSet = cookiesArr.filter(function(cookie) {
-        cookie.url = urlStr;
-
-        if (cookie.hostOnly !== undefined) {
-          delete cookie.hostOnly;
-        }
-        if (cookie.session !== undefined) {
-          delete cookie.session;
-        }
-        if (cookie.user_session !== undefined) {
-          delete cookie.user_session;
-        }
-
-        if (cookie.name === "_gh_sess") {
-          return false;
-        }
-
-        return true;
-      });
-
-      console.log("cookiesToSet: ", cookiesToSet);
-
-      t.deleteCookiesFromCookieStore().then(results => {
-        t.setCookiesToCookieStore(cookiesToSet).then(results => {
-          t.reloadPage().then(console.log);
-        });
-      });
-    } else if (e.target.name === "sign-in-btn") {
-      let cookiesArr = JSON.parse(t.appData[e.target.value].cookies);
-      let urlStr = "https://" + this.domainName;
-      let cookiesToSet = [];
-
-      cookiesToSet = cookiesArr.filter(function(cookie) {
-        cookie.url = urlStr;
-        if (cookie.hostOnly !== undefined) {
-          delete cookie.hostOnly;
-        }
-        if (cookie.session !== undefined) {
-          delete cookie.session;
-        }
-        if (cookie.user_session !== undefined) {
-          delete cookie.user_session;
-        }
-        return true;
-      });
-      t.setCookiesToCookieStore(cookiesToSet).then(() => {
-        t.reloadPage();
-      });
-    } else if (e.target.name === "sign-out-btn") {
-      t.deleteCookiesFromCookieStore().then(() => {
-        t.reloadPage();
-      });
+    let btnName = e.target.name;
+    switch (btnName) {
+      case "sign-out-account-btn":
+        t.signOut(e.target.value);
+        break;
+      case "sign-in-account-btn":
+        t.signIn(e.target.value);
+        break;
+      case "delete-account-btn":
+        t.deleteAccount(e.target.value);
+        break;
+      default:
+        break;
     }
   }
 
-  reloadPage() {
-    return new Promise(function(resolve) {
-      chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.update(tab.id, { url: "https://github.com/login" });
-        // chrome.tabs.reload(tab.id, null, () => {
-        //   window.onload = resolve("finished");
-        // });
+  deleteAccount(index) {
+    let t = this;
+
+    if (t.appData[index].isActive) {
+      t
+        .deleteCookiesFromCookieStore()
+        .then(results => {
+          t
+            .appData
+            .splice(index, 1);
+          t.saveNewAppData();
+          t.reloadPage();
+        })
+    } else {
+      t
+        .appData
+        .splice(index, 1);
+      t.saveNewAppData();
+    }
+
+  }
+
+  signOut(index) {
+
+    let t = this;
+    t.appData[index].isActive = false;
+    t
+      .deleteCookiesFromCookieStore()
+      .then(t.reloadPage().then(t.saveNewAppData()));
+  }
+
+  signIn(index) {
+
+    let t = this;
+
+    t
+      .appData
+      .forEach(elem => {
+        elem.isActive = false;
       });
+
+    t.appData[index].isActive = true;
+
+    t
+      .deleteCookiesFromCookieStore()
+      .then(results => {
+        t
+          .setCookiesToCookieStore(t.appData[index].cookies)
+          .then(t.reloadPage().then(t.saveNewAppData()))
+      })
+  }
+
+  reloadPage() {
+    return new Promise(function (resolve) {
+      chrome
+        .tabs
+        .getSelected(null, function (tab) {
+          chrome
+            .tabs
+            .update(tab.id, {url: "https://github.com"});
+        });
     });
   }
 }
 
-window.onload = function() {
+window.onload = function () {
   let accountSwitcher = new App();
 };
