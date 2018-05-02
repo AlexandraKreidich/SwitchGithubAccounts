@@ -49,11 +49,13 @@ body {
 .user-btn-success {
   background-color: #bb3c51;
   border-color: #af102a;
+  color: whitesmoke;
 }
 
 .user-btn-success:hover {
   background-color: #bb3c51;
   border-color: #fde038;
+  color: whitesmoke;
 }
 
 .active-item {
