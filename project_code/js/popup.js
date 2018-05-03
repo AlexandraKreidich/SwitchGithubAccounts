@@ -21,7 +21,6 @@ class App {
       data = [];
     }
 
-    console.log("getDataFromLocalStorage popup: ", data);
     return data;
   }
 
