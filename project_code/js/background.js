@@ -33,6 +33,9 @@ class BgApp {
 
   refreshUserSession(newValue) {
     let t = this;
+
+    t.appData = t.getDataFromLocalStorage();
+
     t
       .appData
       .forEach(account => {
