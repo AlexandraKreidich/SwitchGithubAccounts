@@ -100,11 +100,6 @@ class BgApp {
         t.saveNewAppData();
         t.isConnected = true;
         port
-          .onMessage
-          .addListener(function (msg) {
-            console.log(msg);
-          });
-        port
           .onDisconnect
           .addListener(function () {
             t.isConnected = false;
@@ -184,7 +179,6 @@ class BgApp {
     t
       .isUserLoggedOutFromGithub()
       .then(result => {
-        console.log("isUserLoggedOutFromGithub: ", result);
         if (result) {
           t
             .appData

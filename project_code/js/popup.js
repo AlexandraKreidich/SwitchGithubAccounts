@@ -242,8 +242,6 @@ class App {
 
   saveNewAppData(newAccount) {
 
-    console.log("saveNewAppData popup: ", this.appData);
-
     if (newAccount !== undefined) {
       this
         .appData
@@ -342,9 +340,8 @@ class App {
       .deleteCookiesFromCookieStore()
       .then(() => {
         t.appData[index].isActive = false;
-        t
-          .reloadPage()
-          .then(t.saveNewAppData());
+        t.saveNewAppData();
+        t.reloadPage();
       })
   }
 
@@ -369,12 +366,18 @@ class App {
         .then(results => {
           t
             .setCookiesToCookieStore(t.appData[index].cookies)
-            .then(t.reloadPage().then(t.saveNewAppData()))
+            .then(() => {
+              t.saveNewAppData();
+              r.reloadPage();
+            })
         })
     } else {
       t
         .setCookiesToCookieStore(t.appData[index].cookies)
-        .then(t.reloadPage().then(t.saveNewAppData()))
+        .then(() => {
+          t.saveNewAppData();
+          t.reloadPage();
+        })
     }
   }
 
