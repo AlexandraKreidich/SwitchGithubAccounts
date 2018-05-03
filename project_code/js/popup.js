@@ -8,6 +8,9 @@ class App {
     this.addNewAccountInput = document.getElementById("new-account-input");
     this.errorMsgDiv = document.getElementById("error-msg");
     this.cookieNames = ["__Host-user_session_same_site", "user_session", "dotcom_user"];
+    this.port = chrome
+      .extension
+      .connect({name: "Background and popup scripts connection"});
     this.addEventListeners();
   }
 
@@ -76,6 +79,14 @@ class App {
           t.onPageRefreshListener();
         }
       });
+
+    t
+      .port
+      .onMessage
+      .addListener(function (msg) {
+        console.log("message from BgApp: ", msg);
+      });
+
     t.showAppData();
   }
 
