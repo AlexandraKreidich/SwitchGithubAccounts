@@ -368,7 +368,7 @@ class App {
             .setCookiesToCookieStore(t.appData[index].cookies)
             .then(() => {
               t.saveNewAppData();
-              r.reloadPage();
+              t.reloadPage();
             })
         })
     } else {
