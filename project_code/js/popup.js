@@ -14,26 +14,6 @@ class App {
     this.addEventListeners();
   }
 
-  refreshUserSession(newValue) {
-
-    let t = this;
-
-    t
-      .appData
-      .forEach(account => {
-        if (account.isActive) {
-          account
-            .cookies
-            .forEach(cookie => {
-              if (cookie.name === "user_session") {
-                cookie.expirationDate = newValue;
-                t.saveNewAppData();
-              }
-            })
-        }
-      })
-  }
-
   getDataFromLocalStorage() {
     let data = JSON.parse(localStorage.getItem(this.domainName));
 
@@ -41,6 +21,7 @@ class App {
       data = [];
     }
 
+    console.log("getDataFromLocalStorage popup: ", data);
     return data;
   }
 
@@ -62,158 +43,8 @@ class App {
       .addEventListener("click", e => {
         t.onErrorMsgDiv(e);
       });
-    chrome
-      .cookies
-      .onChanged
-      .addListener((changeInfo) => {
-        if (changeInfo.cookie.name === "user_session" && changeInfo.cause === "explicit") {
-          t.refreshUserSession(parseFloat(changeInfo.cookie.expirationDate));
-        }
-      });
-
-    chrome
-      .tabs
-      .onUpdated
-      .addListener((tabId, changeInfo, tab) => {
-        if (changeInfo.status === "complete") {
-          t.onPageRefreshListener();
-        }
-      });
-
-    t
-      .port
-      .onMessage
-      .addListener(function (msg) {
-        console.log("message from BgApp: ", msg);
-      });
 
     t.showAppData();
-  }
-
-  insertScript() {
-    var s = document.createElement('script');
-    s.src = chrome
-      .extension
-      .getURL('js/script.js');
-    (document.head || document.documentElement).appendChild(s);
-  }
-
-  onPageRefreshListener() {
-    let t = this;
-
-    t
-      .isUserLoggedOutFromGithub()
-      .then(result => {
-        console.log("isUserLoggedOutFromGithub: ", result);
-        if (result) {
-          t
-            .appData
-            .forEach(elem => {
-              if (elem.isActive) {
-                elem.shouldAssign = true;
-                elem.isActive = false;
-                t.saveNewAppData();
-              }
-            })
-        }
-      });
-
-    t
-      .checkIfLoggedInOnGithub()
-      .then(result => {
-        if (result) {
-          t.checkIfUserCanAssignAccount();
-        }
-      })
-  }
-
-  checkIfUserCanAssignAccount() {
-    let t = this;
-
-    t
-      .getAccountNameFromCookie()
-      .then(userName => {
-        t
-          .appData
-          .forEach(elem => {
-            if (elem.shouldAssign) {
-              elem
-                .cookies
-                .forEach(cookie => {
-                  if (cookie.name === "dotcom_user") {
-                    if (cookie.value === userName) {
-                      elem.isActive = true;
-                      t.saveNewAppData();
-                    }
-                  }
-                });
-            }
-          })
-      });
-  }
-
-  getAccountNameFromCookie() {
-    let t = this;
-
-    return new Promise(function (resolve) {
-      t
-        .getCookiesFromCookieStore()
-        .then(results => {
-          results.forEach(cookie => {
-            if (cookie.name === "dotcom_user") {
-              resolve(cookie.value);
-            }
-          })
-        })
-    });
-  }
-
-  isUserLoggedOutFromGithub() {
-    let t = this;
-
-    return new Promise(function (resolve) {
-      t
-        .checkIfLoggedInOnGithub()
-        .then(result => {
-          if (t.checkIfLoggedInOnExtension() === true && result === false) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-    });
-  }
-
-  checkIfLoggedInOnGithub() {
-    let t = this;
-
-    return new Promise(function (resolve) {
-      t
-        .getCookie("logged_in")
-        .then(cookie => {
-          if (cookie.value === "no") {
-            resolve(false);
-          }
-          resolve(true);
-        }, error => {
-          resolve(false);
-        })
-    });
-  }
-
-  checkIfLoggedInOnExtension() {
-    let flag = false;
-
-    this
-      .appData
-      .forEach(elem => {
-        if (elem.isActive) {
-          flag = true;
-        }
-      });
-
-    //console.log("checkIfLoggedInOnExtension: ", flag);
-    return flag;
   }
 
   getCookie(name) {
@@ -412,6 +243,8 @@ class App {
 
   saveNewAppData(newAccount) {
 
+    console.log("saveNewAppData popup: ", this.appData);
+
     if (newAccount !== undefined) {
       this
         .appData
@@ -434,21 +267,24 @@ class App {
       for (var i in t.appData) {
         let elem = t.appData[i];
         if (elem.isActive && !elem.shouldAssign) {
-          str += '<li class="list-group-item active-item"><div class="row"><div class="col"><h6>' + elem.name + '</h6></div><div class="col"><button type="button" class="btn btn-light btn-sm ch' +
+          str += '<li class="list-group-item active-item"><div class="d-flex"><div class="col text' +
+              '-truncate"><h6 class="account-name">' + elem.name + '</h6></div><div class="col"><button type="button" class="btn btn-light btn-sm ch' +
               'eckout-acc-btn" name="sign-out-account-btn" value=' + i + '>Sign out</button><button type="button" class="btn close" name="delete-account-b' +
               'tn" value=' + i + ">&times;</button></div></div></li>";
         } else if (!elem.isActive && !elem.shouldAssign) {
-          str += '<li class="list-group-item"><div class="row"><div class="col"><h6>' + elem.name + '</h6></div><div class="col"><button type="button" class="btn btn-light btn-sm ch' +
-              'eckout-acc-btn" name="sign-in-account-btn" value=' + i + '>Sign In</button><button type="button" class="btn close" name="delete-account-bt' +
+          str += '<li class="list-group-item"><div class="d-flex"><div class="col text-truncate"><' +
+              'h6 class="account-name">' + elem.name + '</h6></div><div class="col text-truncate"><button type="button" class="btn btn-l' +
+              'ight btn-sm checkout-acc-btn" name="sign-in-account-btn" value=' + i + '>Sign In</button><button type="button" class="btn close" name="delete-account-bt' +
               'n" value=' + i + ">&times;</button></div></div></li>";
         } else if (elem.isActive && elem.shouldAssign) {
-          str += '<li class="list-group-item active-item"><div class="row"><div class="col"><h6>' + elem.name + '</h6></div><div class="col"><button type="button" class="btn btn-danger btn-sm" ' +
-              'name="assign-account-btn" value=' + i + '>Assign</button><button type="button" class="btn close" name="delete-account-btn' +
+          str += '<li class="list-group-item active-item"><div class="d-flex"><div class="col text' +
+              '-truncate"><h6 class="account-name">' + elem.name + '</h6></div><div class="col text-truncate"><button type="button" class="btn btn-d' +
+              'anger btn-sm" name="assign-account-btn" value=' + i + '>Assign</button><button type="button" class="btn close" name="delete-account-btn' +
               '" value=' + i + ">&times;</button></div></div></li>";
         } else if (!elem.isActive && elem.shouldAssign) {
-          str += '<li class="list-group-item list-group-item-dark"><div class="row"><div class="co' +
-              'l"><h6>' + elem.name + '</h6></div><div class="col"><button type="button" class="btn btn-danger btn-sm c' +
-              'heckout-acc-btn" name="sign-out-account-btn" value=' + i + ' disabled>Logged out</button><button type="button" class="btn close" name="delet' +
+          str += '<li class="list-group-item list-group-item-dark"><div class="d-flex"><div class=' +
+              '"col text-truncate"><h6 class="account-name">' + elem.name + '</h6></div><div class="col text-truncate"><button type="button" class="btn btn-d' +
+              'anger btn-sm checkout-acc-btn" name="sign-out-account-btn" value=' + i + ' disabled>Logged out</button><button type="button" class="btn close" name="delet' +
               'e-account-btn" value=' + i + ">&times;</button></div></div></li>";
         }
       }
@@ -493,23 +329,10 @@ class App {
   deleteAccount(index) {
     let t = this;
 
-    if (t.appData[index].isActive && !t.appData[index].shouldAssign) {
-      t
-        .deleteCookiesFromCookieStore()
-        .then(results => {
-          t
-            .appData
-            .splice(index, 1);
-          t.saveNewAppData();
-          t.reloadPage();
-        })
-    } else {
-      t
-        .appData
-        .splice(index, 1);
-      t.saveNewAppData();
-    }
-
+    t
+      .appData
+      .splice(index, 1);
+    t.saveNewAppData();
   }
 
   signOut(index) {

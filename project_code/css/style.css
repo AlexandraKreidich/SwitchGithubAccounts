@@ -65,3 +65,12 @@ body {
 .error-alert {
   width: 400px;
 }
+
+.account-name {
+  line-height: 31px;
+  margin-bottom: 0;
+}
+
+.d-flex {
+  align-items: center;
+}
