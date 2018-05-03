@@ -25,8 +25,8 @@ class BgApp {
       .cookies
       .onChanged
       .addListener((changeInfo) => {
-        if (changeInfo.cookie.name === "user_session" && changeInfo.cause === "explicit") {
-          //t.refreshUserSession(parseFloat(changeInfo.cookie.expirationDate));
+        if (changeInfo.cookie.name === "user_session" && changeInfo.cause === "explicit" && !changeInfo.removed) {
+          t.refreshUserSession(parseFloat(changeInfo.cookie.expirationDate));
         }
       });
   }
@@ -56,12 +56,10 @@ class BgApp {
       data = [];
     }
 
-    console.log("getDataFromLocalStorage: ", data);
     return data;
   }
 
   saveNewAppData() {
-    console.log("saveNewAppData: ", this.appData);
     localStorage.setItem(this.domainName, JSON.stringify(this.appData));
   }
 
@@ -102,11 +100,9 @@ class BgApp {
         port
           .onDisconnect
           .addListener(function () {
-            console.log("disconnected");
             t.isConnected = false;
             t.appData = t.getDataFromLocalStorage();
           });
-        console.log("connected...");
         t.saveNewAppData();
         t.isConnected = true;
       });
