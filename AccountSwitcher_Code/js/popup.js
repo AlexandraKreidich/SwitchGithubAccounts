@@ -385,10 +385,10 @@ class App {
     return new Promise(function (resolve) {
       chrome
         .tabs
-        .getSelected(null, function (tab) {
+        .query({ 'active': true }, function (tabs) {
           chrome
             .tabs
-            .update(tab.id, {url: "https://github.com"});
+            .update(tabs[0].id, {url: tabs[0].url});
         });
     });
   }
