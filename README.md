@@ -3,9 +3,9 @@ Chrome extension to switch between multiple accounts on Github
 
 ## Installation
 
-    1. Download this project
-    2. Unzip the folder wherever you'd like.
-    3. Go to Chrome extensions page (chrome://extensions/) and load the folder as an Unpacked extension.
+1. Download this project
+2. Unzip the folder wherever you'd like.
+3. Go to Chrome extensions page (chrome://extensions/) and load the folder as an Unpacked extension.
     
 ## How it works
 
@@ -18,24 +18,24 @@ ___
     
 ## How to use
 
-    1. After you installed **Account Switcher** and opened Github page you can click on the 
-    logo and see the following:
+1. After you installed **Account Switcher** and opened Github page you can click on the 
+logo and see the following:
 
 
 ![Start](media/start.png)
 
-    2. If you are signed in you can add you account into list. 
-    Just paste a unique name for account and click **Add new**
-    And now you are able to sign in and sign out from your account through the extension.
+2. If you are signed in you can add you account into list. 
+Just paste a unique name for account and click **Add new**
+And now you are able to sign in and sign out from your account through the extension.
   
 ![New account](media/new_account.png)
 
-    3. You should always use extension to login and logout from Github. Just click **Sign out** button.
+3. You should always use extension to login and logout from Github. Just click **Sign out** button.
     
 ![Signed_out](media/signed_out.png)
 
-    4. After you clicked logout button you will be logged out and free to sign in to another account.
-    Then you just should repeat step 2 and add one more account.
+4. After you clicked logout button you will be logged out and free to sign in to another account.
+Then you just should repeat step 2 and add one more account.
     
 ![Second account](media/second_account.png)
 
