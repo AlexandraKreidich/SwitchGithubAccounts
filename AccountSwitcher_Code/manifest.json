@@ -1,9 +1,7 @@
 {
   "manifest_version": 2,
-
   "name": "Account Switcher",
   "version": "1.0",
-
   "permissions": [
     "http://translate.yandex.net/*",
     "cookies",
@@ -15,16 +13,15 @@
     "declarativeContent",
     "activeTab"
   ],
-
   "background": {
-    "scripts": ["js/background.js"],
+    "scripts": [
+      "js/background.js"
+    ],
     "persistent": false
   },
-
   "page_action": {
     "default_popup": "popup.html",
-    "default_icon": "icons/default.jpg"
+    "default_icon": "icons/new.png"
   },
-
   "author": "Alexandra Kreidich"
 }
