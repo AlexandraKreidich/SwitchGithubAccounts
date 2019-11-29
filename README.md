@@ -9,10 +9,10 @@ Chrome extension to switch between multiple accounts on Github
     
 ## How it works
 
-This extension use cookies to manage your accounts.
-It just save cookies to local storage and swipe it when you swipe you accounts.
+This extension uses cookies to manage your accounts.
+It just saves cookies to local storage and swipes it when you swipe you accounts.
 
-This extension **DO NOT** send or collect any data.
+This extension **DOES NOT** send or collect any data.
 
 ___
     
@@ -35,7 +35,7 @@ And now you are able to sign in and sign out from your account through the exten
 ![Signed_out](media/signed_out.png)
 
 4. After you clicked logout button you will be logged out and free to sign in to another account.
-Then you just should repeat step 2 and add one more account.
+Then you just should repeat step 2 to add more accounts. Remember to give them unique names.
     
 ![Second account](media/second_account.png)
 
