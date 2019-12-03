@@ -1,18 +1,19 @@
 {
   "manifest_version": 2,
   "name": "Account Switcher",
-  "version": "1.0",
+  "description": "Chrome extension to switch between multiple accounts on Github",
+  "version": "3.0",
   "permissions": [
-    "http://translate.yandex.net/*",
     "cookies",
     "tabs",
-    "http://*/*",
-    "https://*/*",
     "storage",
     "https://github.com/",
     "declarativeContent",
     "activeTab"
   ],
+  "icons": {
+    "128": "icons/logo.png"
+  },
   "background": {
     "scripts": [
       "js/background.js"
@@ -21,7 +22,7 @@
   },
   "page_action": {
     "default_popup": "popup.html",
-    "default_icon": "icons/new.png"
+    "default_icon": "icons/logo.png"
   },
   "author": "Alexandra Kreidich"
 }
