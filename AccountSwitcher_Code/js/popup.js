@@ -265,7 +265,7 @@ class App {
         let elem = t.appData[i];
         if (elem.isActive && !elem.shouldAssign) {
           str += '<li class="list-group-item active-item"><div class="d-flex"><div class="col text' +
-              '-truncate"><h6 class="account-name">' + elem.name + '</h6></div><div class="col"><button type="button" class="btn btn-light btn-sm ch' +
+              '-truncate"><h6 class="account-name">' + elem.name + '</h6></div><div class="col"><button type="button" class="btn user-btn-success btn-sm ch' +
               'eckout-acc-btn" name="sign-out-account-btn" value=' + i + '>Sign out</button><button type="button" class="btn close" name="delete-account-b' +
               'tn" value=' + i + ">&times;</button></div></div></li>";
         } else if (!elem.isActive && !elem.shouldAssign) {
