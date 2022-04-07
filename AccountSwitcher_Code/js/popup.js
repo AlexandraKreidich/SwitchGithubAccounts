@@ -178,7 +178,7 @@ class App {
             if (cookie.name === 'dotcom_user') {
               if (cookie.value === userName) {
                 result = false;
-                t.errorMsgDiv.innerHTML = t.getErrorMessageHTML('This account already exests.');
+                t.errorMsgDiv.innerHTML = t.getErrorMessageHTML('This account already exists.');
               }
             }
           })
