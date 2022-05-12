@@ -6,10 +6,8 @@
   "permissions": [
     "cookies",
     "tabs",
-    "storage",
     "https://github.com/",
-    "declarativeContent",
-    "activeTab"
+    "declarativeContent"
   ],
   "icons": {
     "128": "icons/logo.png"
